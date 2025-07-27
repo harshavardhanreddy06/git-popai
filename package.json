@@ -1,0 +1,32 @@
+{
+  "name": "parakeet-ai-clone",
+  "version": "1.0.0",
+  "description": "A desktop UI clone of Parakeet AI using Electron.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.2.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "electron": "^29.4.6",
+    "electron-reload": "^2.0.0-alpha.1"
+  },
+  "build": {
+    "appId": "com.parakeet.clone",
+    "mac": {
+      "target": "dmg",
+      "icon": "icon.png"
+    },
+    "files": [
+      "**/*"
+    ],
+    "extraResources": []
+  }
+}
