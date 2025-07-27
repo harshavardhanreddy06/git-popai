@@ -7,8 +7,6 @@ try {
 }
 const { app, BrowserWindow, ipcMain, globalShortcut, screen } = require('electron');
 const path = require('path');
-const dotenv = require('dotenv');
-dotenv.config();
 
 // Suppress uncaught exceptions from being shown to the user
 process.on('uncaughtException', (err) => {
@@ -36,7 +34,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      additionalArguments: [`--openai-api-key=${process.env.OPENAI_API_KEY || ''}`]
+      additionalArguments: []
     }
   });
 

@@ -1,5 +1,5 @@
 # POPAI
-This is a desktop UI of POPAI, built with Electron. It features a floating, transparent, always-on-top window, styled to resemble Parakeet AI's desktop app.
+This is a desktop UI of POPAI, built with Electron. It features a floating, transparent, always-on-top window for AI assistance.
 
 ## How to Run
 

@@ -195,8 +195,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // General settings logic
   const backgroundSelect = document.getElementById('background-select');
-  const parakeetContainer = document.querySelector('.parakeet-container');
-  if (backgroundSelect && parakeetContainer) {
+  const popaiContainer = document.querySelector('.popai-container');
+  if (backgroundSelect && popaiContainer) {
     // Load saved background on startup
     const savedBg = localStorage.getItem('popai_bg');
     if (savedBg) {
@@ -211,8 +211,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     backgroundSelect.addEventListener('change', (e) => {
       if (backgroundSelect.value === 'semi-transparent') {
-        parakeetContainer.style.background = 'rgba(36, 38, 53, 0.85)';
-        parakeetContainer.style.border = '';
+        popaiContainer.style.background = 'rgba(36, 38, 53, 0.85)';
+        popaiContainer.style.border = '';
         const sendBtn = document.querySelector('.input-bar button');
         if (sendBtn) sendBtn.style.background = '';
         const inputField = document.querySelector('.input-bar textarea');
@@ -221,8 +221,8 @@ window.addEventListener('DOMContentLoaded', () => {
         if (responsePanel) responsePanel.style.border = '2px solid #4fd1ff';
         settingsModal.classList.remove('transparent-bg-settings');
       } else if (backgroundSelect.value === 'transparent') {
-        parakeetContainer.style.background = 'transparent';
-        parakeetContainer.style.border = 'none';
+        popaiContainer.style.background = 'transparent';
+        popaiContainer.style.border = 'none';
         settingsModal.classList.add('transparent-bg-settings');
         const sendBtn = document.querySelector('.input-bar button');
         if (sendBtn) sendBtn.style.background = 'none';
