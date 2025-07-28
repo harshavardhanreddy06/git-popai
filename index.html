@@ -13,19 +13,79 @@
   </style>
 </head>
 <body>
-  <div class="popai-container">
+  <!-- Welcome Page -->
+  <div id="welcome-page" class="welcome-page">
+    <div class="welcome-content">
+      <h1>Welcome to POPAI</h1>
+      <div class="welcome-buttons">
+        <button id="open-app" class="welcome-button">START</button>
+        <button id="welcome-settings" class="welcome-button">Settings</button>
+      </div>
+    </div>
+
+    <!-- Settings Modal (only accessible from welcome page) -->
+    <div class="settings-modal" style="display:none;">
+      <div class="settings-navbar">
+        <button class="settings-tab-btn" id="general-tab" data-tab="general">General</button>
+        <button class="settings-tab-btn" id="api-tab" data-tab="api" autofocus>API</button>
+        <button class="settings-tab-btn" id="instructions-tab" data-tab="instructions">Quick Guide</button>
+        <button id="close-settings-navbar" aria-label="Close settings" style="margin-left:auto;font-size:1.3em;background:none;border:none;color:#fff;cursor:pointer;">×</button>
+      </div>
+      <div class="settings-content" id="general-settings-content" style="display:none;">
+        <label for="background-select">Background:</label>
+        <select id="background-select">
+          <option value="semi-transparent">Semi Transparent</option>
+          <option value="transparent">Fully Transparent</option>
+        </select>
+        <button id="save-bg-btn" class="save-btn">Save</button>
+      </div>
+      <div class="settings-content" id="api-settings-content" style="display:block;">
+        <label for="api-key-input">OpenRouter API Key:</label>
+        <input type="password" id="api-key-input" placeholder="sk-or-v1-...">
+        <button id="save-api-key" class="save-btn">Save Key</button>
+        <button id="clear-api-key" class="clear-btn">Clear Key</button>
+      </div>
+      <div class="settings-content" id="instructions-settings-content" style="display:none;">
+        <ul style="margin: 0; padding-left: 20px;">
+          <li><strong>🔑 Add Your AI API Key</strong><br>
+            Save your API key in settings (required to use the AI features).</li>
+          <li><strong>⌨️ Toggle App Visibility</strong><br>
+            Press Shift + O to show or hide the floating app anytime.</li>
+          <li><strong>🗣 Use Speech to Text</strong>
+            <ul style="margin: 5px 0;">
+              <li>Mac: Press shortcut key to start dictation which enables speech to text.</li>
+              <li>Windows: Press Win + H to enable dictation and start speech to text.</li>
+            </ul>
+          </li>
+          <li><strong>📌 Floating App</strong>
+            <ul style="margin: 5px 0;">
+              <li>Stays on top of all windows.</li>
+              <li>Move it anywhere on the screen.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Interface (initially hidden) -->
+  <div id="app-interface" class="popai-container" style="display: none;">
     <div class="window-controls">
-      <button class="settings-btn" title="Settings">⚙️</button>
-      <button class="hide-btn" title="Hide">_</button>
-      <button class="exit-btn" title="Exit">×</button>
+      <button class="hide-btn" aria-label="Minimize">_</button>
+      <button class="exit-btn" aria-label="Close">×</button>
     </div>
+
+    <div class="chat-container">
+      <div class="message-bubble">
+        <span>Just Ask Me....</span>
+      </div>
+    </div>
+
     <div class="input-bar">
-      <textarea placeholder="Type your question..." rows="1"></textarea>
-      <button>Send</button>
+      <textarea placeholder="Type your question..." rows="1" aria-label="Type your question"></textarea>
+      <button aria-label="Send message">Send</button>
     </div>
-    <div class="message-bubble">
-      <span>Just Ask Me....</span>
-    </div>
+
     <div class="settings-modal" style="display:none;">
       <div class="settings-navbar">
         <button class="settings-tab-btn" id="general-tab" data-tab="general">General</button>
@@ -49,22 +109,20 @@
           <button id="clear-api-key">Clear Key</button>
           <button id="close-settings">Close</button>
         </div>
+
       </div>
       <div class="settings-content" id="instructions-settings-content" style="display:none;">
         <ul style="margin: 0; padding-left: 20px;">
           <li><strong>🔑 Add Your AI API Key</strong><br>
-          Paste your API key when prompted (required to use the AI features).</li>
-          
+            Save your API in settings (required to use the AI features).</li>
           <li><strong>⌨️ Toggle App Visibility</strong><br>
-          Press Shift + O to show or hide the floating app anytime.</li>
-          
+            Press Shift + O to show or hide the floating app anytime.</li>
           <li><strong>🗣 Use Speech to Text</strong>
             <ul style="margin: 5px 0;">
-              <li>Mac: Press dictation shortcut key to start speech to text.</li>
-              <li>Windows: Press Win + H to enable dictation.</li>
+              <li>Mac: Press shortcut key to start dictation which enables speech to text.</li>
+              <li>Windows: Press Win + H to enable dictation and start speech to text.</li>
             </ul>
           </li>
-          
           <li><strong>📌 Floating App</strong>
             <ul style="margin: 5px 0;">
               <li>Stays on top of all windows.</li>
@@ -75,6 +133,8 @@
       </div>
     </div>
   </div>
+
+  <!-- Highlight.js & Main Script -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.0/languages/javascript.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.0/languages/typescript.min.js"></script>

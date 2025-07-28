@@ -3,11 +3,66 @@ let openaiApiKey = '';
 window.addEventListener('DOMContentLoaded', () => {
   openaiApiKey = window.env?.OPENAI_API_KEY || '';
 
+  // Get DOM elements
   const textarea = document.querySelector('.input-bar textarea');
   const button = document.querySelector('.input-bar button');
   const messageBubble = document.querySelector('.message-bubble');
   const hideBtn = document.querySelector('.hide-btn');
   const exitBtn = document.querySelector('.exit-btn');
+  
+  // Welcome page elements
+  const welcomePage = document.getElementById('welcome-page');
+  const appInterface = document.getElementById('app-interface');
+  const openAppBtn = document.getElementById('open-app');
+  const welcomeSettingsBtn = document.getElementById('welcome-settings');
+  
+  // Settings modal elements
+  const settingsModal = document.querySelector('.settings-modal');
+  const closeSettingsBtn = document.getElementById('close-settings');
+  const closeSettingsNavbarBtn = document.getElementById('close-settings-navbar');
+
+  // Handle Open App button click with smooth transition
+  if (openAppBtn) {
+    openAppBtn.addEventListener('click', () => {
+      // Start fade out animation for welcome page
+      welcomePage.style.opacity = '0';
+      welcomePage.style.transform = 'translate(-50%, -50%) scale(0.95)';
+      
+      // After fade out completes, hide welcome page and show main interface
+      setTimeout(() => {
+        welcomePage.style.display = 'none';
+        appInterface.style.display = 'flex';
+        
+        // Trigger reflow
+        void appInterface.offsetWidth;
+        
+        // Add visible class to trigger fade in animation
+        appInterface.classList.add('visible');
+        
+        // Focus the textarea when app opens
+        if (textarea) {
+          setTimeout(() => textarea.focus(), 100);
+        }
+      }, 300); // Match this with CSS transition duration
+    });
+  }
+
+  // Handle Welcome Settings button click
+  if (welcomeSettingsBtn) {
+    welcomeSettingsBtn.addEventListener('click', (e) => {
+      const settingsModal = welcomePage.querySelector('.settings-modal');
+      if (settingsModal) {
+        settingsModal.style.display = 'flex';
+        showSettingsTab('api');
+        const savedKey = localStorage.getItem('openrouter_api_key') || '';
+        const apiKeyInput = document.getElementById('api-key-input');
+        if (apiKeyInput) {
+          apiKeyInput.value = savedKey;
+          apiKeyInput.focus();
+        }
+      }
+    });
+  }
 
   // Auto-expand textarea as user types
   textarea.addEventListener('input', () => {
@@ -131,27 +186,29 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   // Settings modal logic
-  const settingsBtn = document.querySelector('.settings-btn');
-  const settingsModal = document.querySelector('.settings-modal');
   const apiKeyInput = document.getElementById('api-key-input');
   const saveApiKeyBtn = document.getElementById('save-api-key');
-  const closeSettingsBtn = document.getElementById('close-settings');
+  
+  // Initialize settings modal if not already done
+  if (!window.settingsModalInitialized) {
+    const settingsModal = document.querySelector('.settings-modal');
+    if (settingsModal) {
+      // Close modal when clicking outside content
+      settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
+          settingsModal.style.display = 'none';
+        }
+      });
 
-  if (settingsBtn && settingsModal) {
-    settingsBtn.addEventListener('click', () => {
-      settingsModal.style.display = 'flex';
-      // Default to API tab
-      showSettingsTab('api');
-      const savedKey = localStorage.getItem('openrouter_api_key') || '';
-      apiKeyInput.value = savedKey;
-      apiKeyInput.focus();
-      // Show saved status
-      if (savedKey) {
-        saveApiKeyBtn.textContent = 'Update Key';
-      } else {
-        saveApiKeyBtn.textContent = 'Save Key';
-      }
-    });
+      // Close on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && settingsModal.style.display === 'flex') {
+          settingsModal.style.display = 'none';
+        }
+      });
+      
+      window.settingsModalInitialized = true;
+    }
   }
 
   // --- Settings tab logic ---
@@ -196,43 +253,87 @@ window.addEventListener('DOMContentLoaded', () => {
   // General settings logic
   const backgroundSelect = document.getElementById('background-select');
   const popaiContainer = document.querySelector('.popai-container');
-  if (backgroundSelect && popaiContainer) {
-    // Load saved background on startup
-    const savedBg = localStorage.getItem('popai_bg');
-    if (savedBg) {
-      backgroundSelect.value = savedBg;
-      if (savedBg === 'semi-transparent') {
-        parakeetContainer.style.background = 'rgba(36, 38, 53, 0.85)';
-      } else if (savedBg === 'transparent') {
-        parakeetContainer.style.background = 'transparent';
-        settingsModal.style.background = 'transparent';
-        settingsModal.style.border = 'none';
+  
+  function updateBackgroundSettings(isTransparent) {
+    if (isTransparent) {
+      // Apply transparent styles only to main container
+      if (popaiContainer) {
+        popaiContainer.style.background = 'transparent';
+        popaiContainer.style.boxShadow = 'none';
+        popaiContainer.classList.add('transparent');
       }
+      document.body.classList.add('transparent-mode');
+    } else {
+      // Revert to semi-transparent styles for main container
+      if (popaiContainer) {
+        popaiContainer.style.background = 'rgba(36, 38, 53, 0.85)';
+        popaiContainer.style.boxShadow = '0 6px 32px rgba(0,0,0,0.25)';
+        popaiContainer.classList.remove('transparent');
+      }
+      document.body.classList.remove('transparent-mode');
     }
-    backgroundSelect.addEventListener('change', (e) => {
-      if (backgroundSelect.value === 'semi-transparent') {
+    
+    // Ensure welcome page always has solid background
+    if (welcomePage) {
+      welcomePage.style.background = 'rgba(36, 38, 53, 0.95)';
+      welcomePage.style.boxShadow = '0 6px 32px rgba(0,0,0,0.25)';
+      welcomePage.style.backdropFilter = 'blur(10px)';
+      welcomePage.style.webkitBackdropFilter = 'blur(10px)';
+      welcomePage.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+    }
+    
+    // Save preference
+    localStorage.setItem('popai_bg', isTransparent ? 'transparent' : 'semi-transparent');
+  }
+
+  if (backgroundSelect) {
+    // Load saved background on startup
+    const savedBg = localStorage.getItem('popai_bg') || 'semi-transparent';
+    backgroundSelect.value = savedBg;
+    updateBackgroundSettings(savedBg === 'transparent');
+    function applyBackgroundSettings(isTransparent) {
+      if (isTransparent) {
+        popaiContainer.style.background = 'transparent';
+        popaiContainer.style.border = 'none';
+        settingsModal.classList.add('transparent-bg-settings');
+        const sendBtn = document.querySelector('.input-bar button');
+        if (sendBtn) {
+          sendBtn.style.background = 'none';
+          sendBtn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        }
+        const inputField = document.querySelector('.input-bar textarea');
+        if (inputField) {
+          inputField.style.background = 'rgba(0, 0, 0, 0.2)';
+          inputField.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+          inputField.style.color = '#fff';
+        }
+        const responsePanel = document.querySelector('.message-bubble');
+        if (responsePanel) {
+          responsePanel.style.background = 'rgba(0, 0, 0, 0.2)';
+          responsePanel.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+        }
+      } else {
         popaiContainer.style.background = 'rgba(36, 38, 53, 0.85)';
         popaiContainer.style.border = '';
+        settingsModal.classList.remove('transparent-bg-settings');
         const sendBtn = document.querySelector('.input-bar button');
         if (sendBtn) sendBtn.style.background = '';
         const inputField = document.querySelector('.input-bar textarea');
         if (inputField) inputField.style.border = '2px solid #4fd1ff';
         const responsePanel = document.querySelector('.message-bubble');
         if (responsePanel) responsePanel.style.border = '2px solid #4fd1ff';
-        settingsModal.classList.remove('transparent-bg-settings');
-      } else if (backgroundSelect.value === 'transparent') {
-        popaiContainer.style.background = 'transparent';
-        popaiContainer.style.border = 'none';
-        settingsModal.classList.add('transparent-bg-settings');
-        const sendBtn = document.querySelector('.input-bar button');
-        if (sendBtn) sendBtn.style.background = 'none';
-        const inputField = document.querySelector('.input-bar textarea');
-        if (inputField) inputField.style.border = 'none';
-        const responsePanel = document.querySelector('.message-bubble');
-        if (responsePanel) responsePanel.style.border = 'none';
-        settingsModal.style.background = 'transparent';
-        settingsModal.style.border = 'none';
       }
+    }
+
+    // Apply initial background settings
+    if (savedBg) {
+      applyBackgroundSettings(savedBg === 'transparent');
+    }
+
+    backgroundSelect.addEventListener('change', (e) => {
+      const isTransparent = backgroundSelect.value === 'transparent';
+      updateBackgroundSettings(isTransparent);
+      localStorage.setItem('popai_bg', backgroundSelect.value);
     });
     // Save button logic
     const saveBgBtn = document.getElementById('save-bg-btn');
@@ -249,8 +350,7 @@ window.addEventListener('DOMContentLoaded', () => {
       settingsModal.style.display = 'none';
     });
   }
-  // Navbar close X button
-  const closeSettingsNavbarBtn = document.getElementById('close-settings-navbar');
+  // Navbar close X button (already initialized at the top of the file)
   if (closeSettingsNavbarBtn && settingsModal) {
     closeSettingsNavbarBtn.addEventListener('click', () => {
       settingsModal.style.display = 'none';
